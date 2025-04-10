@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>ETH Hunter - Mirror Mode</title>
+  <title>ETH Hunter - Mirror Mode (Flexible)</title>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <style>
     body { font-family: sans-serif; padding: 2rem; background: #111; color: #eee; }
@@ -11,7 +11,7 @@
   </style>
 </head>
 <body>
-  <h1>💰 ETH Hunter - Mirror Mode</h1>
+  <h1>💰 ETH Hunter - Mirror Mode (Flexible)</h1>
   <p>Tu contrato: <strong>0xCEbB7900DBb60A5fF111269D88492bb04d74100E</strong></p>
   <button onclick="connect()">🔌 Conectar Wallet</button>
   <div>
@@ -46,7 +46,7 @@
     }
 
     async function tryAttack() {
-      const target = document.getElementById("target").value;
+      const target = document.getElementById("target").value.trim();
       const resultDiv = document.getElementById("result");
 
       if (!contract) {
@@ -55,8 +55,9 @@
       }
 
       try {
+        // Pasar la dirección directamente sin getAddress (más flexible)
         await contract.queueTargetChange(target);
-        resultDiv.innerHTML = "✅ Target seteado. Espera 24h o ejecuta mirrorWithdraw si el contrato lo permite.";
+        resultDiv.innerHTML = "✅ Target seteado. Puedes ejecutar mirrorWithdraw luego del delay.";
       } catch (err) {
         resultDiv.innerHTML = "❌ Error: " + err.message;
       }
